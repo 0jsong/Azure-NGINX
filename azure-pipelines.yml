@@ -1,19 +1,25 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger:
-- main
+  branches:
+    include:
+      - main  # 변경을 감지할 브랜치
 
-pool:
-  vmImage: ubuntu-latest
+jobs:
+  - job: DeployNGINX
+    pool:
+      vmImage: 'ubuntu-latest'  # 사용할 VM 이미지
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+    steps:
+      - checkout: self  # 리포지토리 체크아웃
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/conf.d'  # 소스 폴더
+          Contents: '**'  # 모든 파일 포함
+          TargetFolder: '/path/to/nginx/conf.d'  # 대상 경로
+
+      - task: SSH@0
+        inputs:
+          sshEndpoint: 'MySSHConnection'  # SSH 연결 설정
+          runOptions: 'commands'  # 실행할 옵션
+          commands: |
+            sudo nginx -s reload  # NGINX 재시작 명령
