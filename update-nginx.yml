@@ -20,6 +20,7 @@ jobs:
           Contents: '**'  # 모든 파일 포함
           TargetFolder: '/etc/nginx/conf.d'  # 대상 경로
           CleanTargetFolder: true  # Clean 옵션 추가
+          OverWrite: true
 
       - task: CopyFiles@2
         inputs:
