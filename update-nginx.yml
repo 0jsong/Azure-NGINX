@@ -1,8 +1,3 @@
-trigger:
-  branches:
-    include:
-      - main  # 변경을 감지할 브랜치
-
 jobs:
   - job: DeployNGINX
     pool:
@@ -10,24 +5,26 @@ jobs:
 
     steps:
       - checkout: self  # 리포지토리 체크아웃
-        clean: true  # 이전 파일 삭제
+
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)'  # 소스 폴더
+          Contents: 'nginx.conf'  # nginx.conf 파일 포함
+          TargetFolder: '/tmp/nginx'  # 임시 경로
+          CleanTargetFolder: true
 
       - task: CopyFiles@2
         inputs:
           SourceFolder: '$(Build.SourcesDirectory)/conf.d'  # 소스 폴더
           Contents: '**'  # 모든 파일 포함
-          TargetFolder: '/etc/nginx/conf.d'  # 대상 경로
+          TargetFolder: '/tmp/nginx/conf.d'  # 임시 경로
           CleanTargetFolder: true
-
-      - task: CopyFiles@2
-        inputs:
-          SourceFolder: '$(Build.SourcesDirectory)'  # 소스 폴더 (루트)
-          Contents: 'nginx.conf'  # nginx.conf 파일 포함
-          TargetFolder: '/etc/nginx'  # NGINX 설정 디렉토리
 
       - task: SSH@0
         inputs:
           sshEndpoint: 'NGINX OSS'  # SSH 연결 설정
           runOptions: 'commands'  # 실행할 옵션
           commands: |
+            sudo cp /tmp/nginx/nginx.conf /etc/nginx/nginx.conf  # nginx.conf 복사
+            sudo cp -r /tmp/nginx/conf.d/* /etc/nginx/conf.d/  # conf.d 내용 복사
             sudo nginx -s reload  # NGINX 재시작 명령
