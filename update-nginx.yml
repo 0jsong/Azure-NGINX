@@ -3,6 +3,9 @@ trigger:
     include:
       - main  # 변경을 감지할 브랜치
 
+pool:
+  name: 'Default'
+
 jobs:
   - job: DeployNGINX
     pool:
@@ -24,9 +27,6 @@ jobs:
           Contents: 'nginx.conf'  # nginx.conf 파일만 포함
           TargetFolder: '/etc/nginx'  # NGINX 설정이 있는 경로
 
-      - task: SSH@0
-        inputs:
-          sshEndpoint: 'NGINX OSS'  # SSH 연결 설정
-          runOptions: 'commands'  # 실행할 옵션
-          commands: |
-            sudo nginx -s reload  # NGINX 재시작 명령
+      - script: |
+          sudo nginx -s reload
+        displayName: 'NGINX 재시작'
