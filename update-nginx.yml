@@ -1,0 +1,32 @@
+trigger:
+  branches:
+    include:
+      - main  # 변경을 감지할 브랜치
+
+jobs:
+  - job: DeployNGINX
+    pool:
+      vmImage: 'ubuntu-latest'  # 사용할 VM 이미지
+
+    steps:
+      - checkout: self  # 리포지토리 체크아웃
+        clean: true  # 이전 파일 삭제
+
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)/conf.d'  # 소스 폴더
+          Contents: '**'  # 모든 파일 포함
+          TargetFolder: '/etc/nginx/conf.d'  # 대상 경로
+
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: '$(Build.SourcesDirectory)'  # 소스 폴더 (루트)
+          Contents: 'nginx.conf'  # nginx.conf 파일 포함
+          TargetFolder: '/etc/nginx'  # NGINX 설정 디렉토리
+
+      - task: SSH@0
+        inputs:
+          sshEndpoint: 'MySSHConnection'  # SSH 연결 설정
+          runOptions: 'commands'  # 실행할 옵션
+          commands: |
+            sudo nginx -s reload  # NGINX 재시작 명령
