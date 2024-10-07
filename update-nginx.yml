@@ -8,6 +8,8 @@ pool:
 
 jobs:
   - job: DeployNGINX
+    variables:
+      system.debug: true
 
     steps:
       - checkout: self  # 리포지토리 체크아웃
