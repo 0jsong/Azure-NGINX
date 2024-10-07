@@ -10,22 +10,8 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            # 설정 파일 백업
-            sudo cp -r /etc/nginx/conf.d /etc/nginx/conf.d.backup
-            sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup
-
-            # 새 설정 복사
+            # 이제 비밀번호 없이 실행 가능
             sudo cp -r $(Build.SourcesDirectory)/conf.d/* /etc/nginx/conf.d/
             sudo cp $(Build.SourcesDirectory)/nginx.conf /etc/nginx/
-
-            # 설정 테스트
-            if sudo nginx -t; then
-              sudo systemctl reload nginx
-            else
-              # 설정 오류 시 롤백
-              sudo mv /etc/nginx/conf.d.backup/* /etc/nginx/conf.d/
-              sudo mv /etc/nginx/nginx.conf.backup /etc/nginx/nginx.conf
-              sudo systemctl reload nginx
-              exit 1
-            fi
-        displayName: 'NGINX 설정 업데이트'
+            sudo nginx -t && sudo systemctl reload nginx
+        displayName: 'Update NGINX configuration'
