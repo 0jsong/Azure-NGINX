@@ -18,8 +18,8 @@ jobs:
             sudo cp $(Build.SourcesDirectory)/nginx.conf /etc/nginx/
             
             # 설정 테스트
-            if ! output=$(sudo nginx -t 2>&1); then
-              echo "NGINX configuration test failed: $output"
+            if ! sudo nginx -t; then
+              echo "NGINX configuration test failed"
               exit 1  # 실패 시 파이프라인 에러 발생
             fi
 
