@@ -17,6 +17,7 @@ jobs:
           SourceFolder: '$(Build.SourcesDirectory)/conf.d'  # 소스 폴더
           Contents: '**'  # 모든 파일 포함
           TargetFolder: '/etc/nginx/conf.d'  # 대상 경로
+          CleanTargetFolder: true
 
       - task: CopyFiles@2
         inputs:
@@ -26,7 +27,7 @@ jobs:
 
       - task: SSH@0
         inputs:
-          sshEndpoint: 'MySSHConnection'  # SSH 연결 설정
+          sshEndpoint: 'NGINX OSS'  # SSH 연결 설정
           runOptions: 'commands'  # 실행할 옵션
           commands: |
             sudo nginx -s reload  # NGINX 재시작 명령
