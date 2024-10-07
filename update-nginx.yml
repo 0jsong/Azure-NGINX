@@ -8,8 +8,6 @@ pool:
 
 jobs:
   - job: DeployNGINX
-    pool:
-      vmImage: 'ubuntu-latest'  # 사용할 VM 이미지
 
     steps:
       - checkout: self  # 리포지토리 체크아웃
