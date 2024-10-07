@@ -10,25 +10,19 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            set -x  # 디버깅 모드 활성화
-            echo "Before removing files:"
-            ls -la /etc/nginx/conf.d/
-
             # conf.d 디렉토리 비우기
             sudo rm -rf /etc/nginx/conf.d/*
-
-            echo "After removing files:"
-            ls -la /etc/nginx/conf.d/
 
             # 새 설정 파일 복사
             sudo cp -r $(Build.SourcesDirectory)/conf.d/* /etc/nginx/conf.d/
             sudo cp $(Build.SourcesDirectory)/nginx.conf /etc/nginx/
             
             # 설정 테스트
-            if sudo nginx -t; then
-              sudo nginx -s reload
-              echo "NGINX configuration updated successfully"
-            else
+            if ! sudo nginx -t; then          
               echo "NGINX configuration test failed"
+              exit 1
             fi
+
+            sudo nginx -s reload
+            echo "NGINX configuration updated successfully"
         displayName: 'Update NGINX configuration'
