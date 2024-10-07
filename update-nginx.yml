@@ -10,11 +10,6 @@ jobs:
         inputs:
           targetType: 'inline'
           script: |
-            # 백업 생성
-            timestamp=$(date +%Y%m%d_%H%M%S)
-            sudo cp -r /etc/nginx/conf.d /etc/nginx/conf.d.backup_${timestamp}
-            sudo cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup_${timestamp}
-            
             # conf.d 디렉토리 비우기
             sudo rm -rf /etc/nginx/conf.d/*
             
@@ -24,19 +19,11 @@ jobs:
             
             # 설정 테스트
             if sudo nginx -t; then
-              sudo systemctl reload nginx
+              sudo nginx -s reload
               echo "NGINX configuration updated successfully"
-              
-              # 성공 시 이전 백업 삭제 (선택사항)
-              sudo rm -rf /etc/nginx/conf.d.backup_${timestamp}
-              sudo rm -f /etc/nginx/nginx.conf.backup_${timestamp}
+
             else
               echo "NGINX configuration test failed, rolling back"
-              # 실패 시 롤백
-              sudo rm -rf /etc/nginx/conf.d/*
-              sudo cp -r /etc/nginx/conf.d.backup_${timestamp}/* /etc/nginx/conf.d/
-              sudo cp /etc/nginx/nginx.conf.backup_${timestamp} /etc/nginx/nginx.conf
-              exit 1
             fi
         displayName: 'Update NGINX configuration'
 
